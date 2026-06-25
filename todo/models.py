@@ -15,4 +15,3 @@ class Task(models.Model):
         if self.due_at is None:
             return False
         return self.due_at < dt
-    

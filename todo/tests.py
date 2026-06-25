@@ -31,7 +31,6 @@ class TaskModelTestCase(TestCase):
         self.assertFalse(task.completed)
         self.assertIsNone(task.due_at, None)
 
-
     def test_is_overdue_future(self):
         due = timezone.make_aware(datetime(2024, 6, 30, 23, 59, 59))
         current = timezone.make_aware(datetime(2024, 6, 30, 0, 0, 0))
@@ -99,4 +98,3 @@ class TaskViewTestCase(TestCase):
         self.assertEqual(response.templates[0].name, 'todo/index.html')
         self.assertEqual(response.context['tasks'][0], task1)
         self.assertEqual(response.context['tasks'][1], task2)
-        
