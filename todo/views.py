@@ -10,9 +10,21 @@ from todo.models import Task
 
 def index(request):
     if request.method == 'POST':
-        task = Task(title=request.POST['title'],
-                    due_at=make_aware(parse_datetime(request.POST['due_at'])))
-        task.save()
+        action = request.POST.get('action', 'create')
+        if action == 'create':
+            due_at = request.POST.get('due_at')
+            task = Task(
+                title=request.POST['title'],
+                due_at=make_aware(parse_datetime(due_at)) if due_at else None
+            )
+            task.save()
+        else:
+            selected_ids = request.POST.getlist('task_ids')
+            if selected_ids:
+                if action == 'complete':
+                    Task.objects.filter(pk__in=selected_ids).update(completed=True)
+                elif action == 'delete':
+                    Task.objects.filter(pk__in=selected_ids).delete()
 
     query = request.GET.get('q', '').strip()
     order = request.GET.get('order')
@@ -52,6 +64,15 @@ def delete(request, task_id):
         raise Http404("Task does not exist")
     task.delete()
     return redirect(index)
+
+def complete(request, task_id):
+    try:
+        task = Task.objects.get(pk=task_id)
+    except Task.DoesNotExist:
+        raise Http404("Task does not exist")
+    task.completed = not task.completed
+    task.save()
+    return redirect(detail, task_id)
 
 def update(request, task_id):
     try:

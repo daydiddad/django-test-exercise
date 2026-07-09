@@ -33,31 +33,37 @@
       <a href="{% url 'index' %}?order=post{% if query %}&q={{ query|urlencode }}{% endif %}">Sort by Posted Date</a>
     </div>
 
-    <form action="{% url 'index' %}" method="get">
+    <form action="{% url 'index' %}" method="post">
+      {% csrf_token %}
       <div>
         <label for="searchInput">Search by title</label><br>
         <input id="searchInput" name="q" type="search" value="{{ query }}" placeholder="Search title">
         <input type="hidden" name="order" value="{{ current_order }}">
         <button type="submit">Search</button>
+        <button type="submit" name="action" value="complete">一括完了</button>
+        <button type="submit" name="action" value="delete">一括削除</button>
       </div>
-    </form>
 
-    {% for task in tasks %}
-    <div class="text">
-      <h2><a href="{% url 'detail' task.id %}">{{ task.title }}</a></h2>
-      <ul>
-        <li>Posted at: {{ task.posted_at }}</li>
-        {% if task.due_at %} 
-        <li>Due at: {{ task.due_at }}</li>
-        {% endif %}
-        {% if task.completed %} 
-        <li>Status: Completed</li>
-        {% else %}
-        <li>Status: Not Completed</li>
-        {% endif %}
-      </ul>
-    </div>
-    {% endfor %}
+      {% for task in tasks %}
+      <div class="text">
+        <label>
+          <input type="checkbox" name="task_ids" value="{{ task.pk }}">
+          <strong><a href="{% url 'detail' task.id %}">{{ task.title }}</a></strong>
+        </label>
+        <ul>
+          <li>Posted at: {{ task.posted_at }}</li>
+          {% if task.due_at %}
+          <li>Due at: {{ task.due_at }}</li>
+          {% endif %}
+          {% if task.completed %}
+          <li>Status: Completed</li>
+          {% else %}
+          <li>Status: Not Completed</li>
+          {% endif %}
+        </ul>
+      </div>
+      {% endfor %}
+    </form>
   </body>
 
 </html>
