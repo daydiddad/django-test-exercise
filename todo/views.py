@@ -10,9 +10,21 @@ from todo.models import Task
 
 def index(request):
     if request.method == 'POST':
-        task = Task(title=request.POST['title'],
-                    due_at=make_aware(parse_datetime(request.POST['due_at'])))
-        task.save()
+        action = request.POST.get('action', 'create')
+        if action == 'create':
+            due_at = request.POST.get('due_at')
+            task = Task(
+                title=request.POST['title'],
+                due_at=make_aware(parse_datetime(due_at)) if due_at else None
+            )
+            task.save()
+        else:
+            selected_ids = request.POST.getlist('task_ids')
+            if selected_ids:
+                if action == 'complete':
+                    Task.objects.filter(pk__in=selected_ids).update(completed=True)
+                elif action == 'delete':
+                    Task.objects.filter(pk__in=selected_ids).delete()
 
     if request.GET.get('order') == 'due':
         tasks = Task.objects.order_by('due_at')

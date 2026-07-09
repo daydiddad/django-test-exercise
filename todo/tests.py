@@ -156,31 +156,37 @@ class TaskViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_complete_get_success(self):
-        task = Task(title="task1", due_at=timezone.make_aware(datetime(2024, 7, 1)))
-        task.save()
+    def test_bulk_complete_post_success(self):
+        task1 = Task(title="task1")
+        task1.save()
+        task2 = Task(title="task2")
+        task2.save()
         client = Client()
 
-        response = client.get('/{}/complete/'.format(task.pk))
+        response = client.post('/', {
+            'action': 'complete',
+            'task_ids': [str(task1.pk), str(task2.pk)],
+        })
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, '/{}/'.format(task.pk))
-        updated_task = Task.objects.get(pk=task.pk)
-        self.assertTrue(updated_task.completed)
+        self.assertEqual(response.status_code, 200)
 
-    def test_complete_get_toggles_back(self):
-        task = Task(title="task1", completed=True)
-        task.save()
+        task1.refresh_from_db()
+        task2.refresh_from_db()
+        self.assertTrue(task1.completed)
+        self.assertTrue(task2.completed)
+
+    def test_bulk_delete_post_success(self):
+        task1 = Task(title="task1")
+        task1.save()
+        task2 = Task(title="task2")
+        task2.save()
         client = Client()
 
-        response = client.get('/{}/complete/'.format(task.pk))
+        response = client.post('/', {
+            'action': 'delete',
+            'task_ids': [str(task1.pk)],
+        })
 
-        self.assertEqual(response.status_code, 302)
-        updated_task = Task.objects.get(pk=task.pk)
-        self.assertFalse(updated_task.completed)
-
-    def test_complete_get_fail(self):
-        client = Client()
-        response = client.get('/1/complete/')
-
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Task.objects.filter(pk=task1.pk).count(), 0)
+        self.assertEqual(Task.objects.filter(pk=task2.pk).count(), 1)
