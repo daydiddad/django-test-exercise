@@ -29,13 +29,17 @@
     <br>
 
     <div>
-      <a href="{% url 'index' %}?order=due">Sort by Due Date</a> |
-      <a href="{% url 'index' %}?order=post">Sort by Posted Date</a>
+      <a href="{% url 'index' %}?order=due{% if query %}&q={{ query|urlencode }}{% endif %}">Sort by Due Date</a> |
+      <a href="{% url 'index' %}?order=post{% if query %}&q={{ query|urlencode }}{% endif %}">Sort by Posted Date</a>
     </div>
 
     <form action="{% url 'index' %}" method="post">
       {% csrf_token %}
       <div>
+        <label for="searchInput">Search by title</label><br>
+        <input id="searchInput" name="q" type="search" value="{{ query }}" placeholder="Search title">
+        <input type="hidden" name="order" value="{{ current_order }}">
+        <button type="submit">Search</button>
         <button type="submit" name="action" value="complete">一括完了</button>
         <button type="submit" name="action" value="delete">一括削除</button>
       </div>
