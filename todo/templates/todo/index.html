@@ -41,12 +41,17 @@
         {% if task.due_at %} 
         <li>Due at: {{ task.due_at }}</li>
         {% endif %}
-        {% if task.completed %} 
+        {% if task.completed %}
         <li>Status: Completed</li>
         {% else %}
         <li>Status: Not Completed</li>
         {% endif %}
       </ul>
+      {% if task.completed %}
+      <a href="{% url 'complete' task.id %}">Mark as Not Completed</a>
+      {% else %}
+      <a href="{% url 'complete' task.id %}">Mark as Completed</a>
+      {% endif %}
     </div>
     {% endfor %}
   </body>
