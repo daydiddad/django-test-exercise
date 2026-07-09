@@ -55,6 +55,15 @@ def delete(request, task_id):
     task.delete()
     return redirect(index)
 
+def complete(request, task_id):
+    try:
+        task = Task.objects.get(pk=task_id)
+    except Task.DoesNotExist:
+        raise Http404("Task does not exist")
+    task.completed = not task.completed
+    task.save()
+    return redirect(detail, task_id)
+
 def update(request, task_id):
     try:
         task = Task.objects.get(pk=task_id)
