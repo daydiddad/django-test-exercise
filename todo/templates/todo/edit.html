@@ -5,29 +5,32 @@
   <head>
     <title>ToDoアプリケーション</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="INIAD">
     <link rel="stylesheet" href="{% static 'todo/style.css' %}">
   </head>
 
   <body>
+    <span class="eyebrow">Edit Task</span>
     <h1>タスクを編集</h1>
     <p>以下のフォームからタスクを編集できます。</p>
-    <form action="{% url 'update' task.id%}" method="post">
+    <form action="{% url 'update' task.id%}" method="post" class="card">
       {% csrf_token %}
-      <div>
-        <label for="titleInput">タイトル</label><br>
+      <div class="field">
+        <label for="titleInput">タイトル</label>
         <input id="titleInput" name="title" type="text" placeholder="タイトルを入力" value="{{ task.title }}">
       </div>
 
-      <div>
-        <label for="dueInput">期限:</label><br>
+      <div class="field">
+        <label for="dueInput">期限</label>
         <input id="dueInput" name="due_at" type="datetime-local" value="{% if task.due_at %}{{ task.due_at|date:'Y-m-d H:i' }}{% endif %}">
       </div>
-      <div>
-        <button type="submit">送信</button>
-      </div>
+      <button type="submit" class="btn btn-primary btn-block">保存する</button>
     </form>
-    <br>
+
+    <div class="sort-nav">
+      <a href="{% url 'detail' task.id %}">タスク詳細に戻る</a>
+    </div>
   </body>
 
 </html>
