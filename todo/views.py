@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import Http404
+from django.utils import timezone
 from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_datetime
 from todo.models import Task
@@ -8,17 +9,29 @@ from todo.models import Task
 # Create your views here.
 
 
+def parse_due_at(due_at):
+    if not due_at:
+        return None
+    parsed = parse_datetime(due_at)
+    if parsed is None:
+        return None
+    if timezone.is_naive(parsed):
+        return make_aware(parsed)
+    return parsed
+
+
 def index(request):
     if request.method == 'POST':
         action = request.POST.get('action', 'create')
-        if action == 'create':
+        title = request.POST.get('title', '').strip()
+        if action == 'create' and title:
             due_at = request.POST.get('due_at')
             task = Task(
-                title=request.POST['title'],
-                due_at=make_aware(parse_datetime(due_at)) if due_at else None
+                title=title,
+                due_at=parse_due_at(due_at)
             )
             task.save()
-        else:
+        elif action in {'complete', 'delete'}:
             selected_ids = request.POST.getlist('task_ids')
             if selected_ids:
                 if action == 'complete':
@@ -26,8 +39,8 @@ def index(request):
                 elif action == 'delete':
                     Task.objects.filter(pk__in=selected_ids).delete()
 
-    query = request.GET.get('q', '').strip()
-    order = request.GET.get('order')
+    query = request.POST.get('q', request.GET.get('q', '')).strip()
+    order = request.POST.get('order', request.GET.get('order'))
 
     if query:
         tasks = Task.objects.filter(title__icontains=query)
@@ -74,6 +87,17 @@ def complete(request, task_id):
     task.save()
     return redirect(detail, task_id)
 
+def set_deadline(request, task_id):
+    try:
+        task = Task.objects.get(pk=task_id)
+    except Task.DoesNotExist:
+        raise Http404("Task does not exist")
+    if request.method == 'POST':
+        due_at = request.POST.get('due_at')
+        task.due_at = parse_due_at(due_at)
+        task.save()
+    return redirect(index)
+
 def update(request, task_id):
     try:
         task = Task.objects.get(pk=task_id)
@@ -81,7 +105,8 @@ def update(request, task_id):
         raise Http404("Task does not exist")
     if request.method == 'POST':
         task.title = request.POST['title']
-        task.due_at = make_aware(parse_datetime(request.POST['due_at']))
+        due_at = request.POST.get('due_at')
+        task.due_at = parse_due_at(due_at)
         task.save()
         return redirect(detail, task_id)
 

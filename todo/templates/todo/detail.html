@@ -3,7 +3,7 @@
 <html lang="ja">
 
   <head>
-    <title>To Do Application</title>
+    <title>ToDoアプリケーション</title>
     <meta charset="UTF-8">
     <meta name="author" content="INIAD">
     <link rel="stylesheet" href="{% static 'todo/style.css' %}">
@@ -12,25 +12,25 @@
   <body>
     <h1>{{ task.title }}</h1>
     <ul>
-      <li>Posted at: {{ task.posted_at }}</li>
+      <li>投稿日時: {{ task.posted_at }}</li>
       {% if task.due_at %}
-      <li>Due at: {{ task.due_at }}</li>
+      <li>期限: {{ task.due_at }}</li>
       {% endif %}
       {% if task.completed %}
-      <li>Status: Completed</li>
+      <li>ステータス: 完了</li>
       {% else %}
-      <li>Status: Not Completed</li>
+      <li>ステータス: 未完了</li>
       {% endif %}
     </ul>
 
     <div>
-      <a href="{% url 'index' %}">Top</a>
-      <a href="{% url 'delete' task.id %}">Delete</a>
-      <a href="{% url 'update' task.id %}">Edit</a>
+      <a href="{% url 'index' %}">トップへ戻る</a>
+      <a href="{% url 'delete' task.id %}">削除</a>
+      <a href="{% url 'update' task.id %}">編集</a>
       {% if task.completed %}
-      <a href="{% url 'complete' task.id %}">Mark as Not Completed</a>
+      <a href="{% url 'complete' task.id %}">未完了に戻す</a>
       {% else %}
-      <a href="{% url 'complete' task.id %}">Mark as Completed</a>
+      <a href="{% url 'complete' task.id %}">完了にする</a>
       {% endif %}
     </div>
   </body>

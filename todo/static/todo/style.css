@@ -107,6 +107,16 @@ button:hover {
   color: #4a205f;
 }
 
+.text.urgent {
+  border: 2px solid #d9534f;
+  background: rgba(255, 236, 236, 0.95);
+}
+
+.text.warning {
+  border: 2px solid #f0ad4e;
+  background: rgba(255, 246, 227, 0.95);
+}
+
 body > div {
   text-align: center;
   margin: 8px auto 20px;
