@@ -316,6 +316,55 @@ button {
   background: var(--warning-bg);
 }
 
+.text.category-homework {
+  border-left: 6px solid #4a90e2;
+}
+
+.text.category-parttime {
+  border-left: 6px solid #f5a623;
+}
+
+.text.category-circle {
+  border-left: 6px solid #2ecc71;
+}
+
+.text.category-private {
+  border-left: 6px solid #9b59b6;
+}
+
+.category-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.category-homework .category-badge,
+.category-homework {
+  background: #e8f1ff;
+  color: #2457a5;
+}
+
+.category-parttime .category-badge,
+.category-parttime {
+  background: #fff3e0;
+  color: #9a4f04;
+}
+
+.category-circle .category-badge,
+.category-circle {
+  background: #e8f8ee;
+  color: #226b2b;
+}
+
+.category-private .category-badge,
+.category-private {
+  background: #f3e8ff;
+  color: #7b2cbf;
+}
+
 .empty {
   text-align: center;
   color: var(--muted);

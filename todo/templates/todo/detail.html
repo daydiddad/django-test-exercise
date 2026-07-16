@@ -19,6 +19,7 @@
         {% if task.due_at %}
         <li>期限: {{ task.due_at }}</li>
         {% endif %}
+        <li>カテゴリ: {{ task.get_category_display }}</li>
         {% if task.completed %}
         <li>ステータス: 完了</li>
         {% else %}

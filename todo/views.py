@@ -28,9 +28,11 @@ def index(request):
         title = request.POST.get('title', '').strip()
         if action == 'create' and title:
             due_at = request.POST.get('due_at')
+            category = request.POST.get('category', '課題')
             task = Task(
                 title=title,
-                due_at=parse_due_at(due_at)
+                due_at=parse_due_at(due_at),
+                category=category,
             )
             task.save()
         elif action in {'complete', 'delete'}:
@@ -58,6 +60,7 @@ def index(request):
         'tasks': tasks,
         'query': query,
         'current_order': order or 'post',
+        'category_choices': Task.CATEGORY_CHOICES,
     }
     return render(request, 'todo/index.html', context)
 
@@ -130,11 +133,14 @@ def update(request, task_id):
     if request.method == 'POST':
         task.title = request.POST['title']
         due_at = request.POST.get('due_at')
+        category = request.POST.get('category', '課題')
         task.due_at = parse_due_at(due_at)
+        task.category = category
         task.save()
         return redirect(detail, task_id)
 
     context = {
         'task': task,
+        'category_choices': Task.CATEGORY_CHOICES,
     }
     return render(request, 'todo/edit.html', context)

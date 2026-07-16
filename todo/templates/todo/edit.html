@@ -22,6 +22,15 @@
       </div>
 
       <div class="field">
+        <label for="categoryInput">カテゴリ</label>
+        <select id="categoryInput" name="category">
+          {% for value, label in category_choices %}
+          <option value="{{ value }}" {% if task.category == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field">
         <label for="dueInput">期限</label>
         <input id="dueInput" name="due_at" type="datetime-local" value="{% if task.due_at %}{{ task.due_at|date:'Y-m-d H:i' }}{% endif %}">
       </div>
