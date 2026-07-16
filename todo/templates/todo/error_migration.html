@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>マイグレーションエラー</title>
+    <link rel="stylesheet" href="{% static 'todo/style.css' %}">
+  </head>
+  <body>
+    <h1>データベースのセットアップが必要です</h1>
+    <p>アプリケーションは必要なデータベース列が存在しないため、操作を継続できませんでした。</p>
+    <p>自動的にマイグレーションを実行しようとしましたが失敗しました。</p>
+    <div class="card">
+      <p>手動で以下を実行して問題を解消してください。</p>
+      <pre>source venv/bin/activate
+python manage.py migrate</pre>
+      <p>エラー詳細: {{ error }}</p>
+      <p><a href="{% url 'index' %}">トップに戻る</a></p>
+    </div>
+  </body>
+</html>
