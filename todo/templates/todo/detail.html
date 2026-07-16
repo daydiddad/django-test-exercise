@@ -5,33 +5,37 @@
   <head>
     <title>ToDoアプリケーション</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="INIAD">
     <link rel="stylesheet" href="{% static 'todo/style.css' %}">
   </head>
 
   <body>
+    <span class="eyebrow">Task Detail</span>
     <h1>{{ task.title }}</h1>
-    <ul>
-      <li>投稿日時: {{ task.posted_at }}</li>
-      {% if task.due_at %}
-      <li>期限: {{ task.due_at }}</li>
-      {% endif %}
-      {% if task.completed %}
-      <li>ステータス: 完了</li>
-      {% else %}
-      <li>ステータス: 未完了</li>
-      {% endif %}
-    </ul>
+    <div class="card">
+      <ul class="meta">
+        <li>投稿日時: {{ task.posted_at }}</li>
+        {% if task.due_at %}
+        <li>期限: {{ task.due_at }}</li>
+        {% endif %}
+        {% if task.completed %}
+        <li>ステータス: 完了</li>
+        {% else %}
+        <li>ステータス: 未完了</li>
+        {% endif %}
+      </ul>
 
-    <div>
-      <a href="{% url 'index' %}">トップへ戻る</a>
-      <a href="{% url 'delete' task.id %}">削除</a>
-      <a href="{% url 'update' task.id %}">編集</a>
-      {% if task.completed %}
-      <a href="{% url 'complete' task.id %}">未完了に戻す</a>
-      {% else %}
-      <a href="{% url 'complete' task.id %}">完了にする</a>
-      {% endif %}
+      <div class="actions">
+        <a class="btn btn-outline" href="{% url 'index' %}">トップへ戻る</a>
+        <a class="btn btn-outline" href="{% url 'update' task.id %}">編集</a>
+        {% if task.completed %}
+        <a class="btn btn-outline" href="{% url 'complete' task.id %}">未完了に戻す</a>
+        {% else %}
+        <a class="btn btn-primary" href="{% url 'complete' task.id %}">完了にする</a>
+        {% endif %}
+        <a class="btn btn-danger" href="{% url 'delete' task.id %}">削除</a>
+      </div>
     </div>
   </body>
 
