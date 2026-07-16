@@ -5,7 +5,12 @@ from django.http import Http404
 from django.utils import timezone
 from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_datetime
+from django.db.utils import OperationalError
+from django.core.management import call_command
 from todo.models import Task
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Create your views here.
@@ -46,10 +51,26 @@ def index(request):
     query = request.POST.get('q', request.GET.get('q', '')).strip()
     order = request.POST.get('order', request.GET.get('order'))
 
-    if query:
-        tasks = Task.objects.filter(title__icontains=query)
-    else:
-        tasks = Task.objects.all()
+    try:
+        if query:
+            tasks = Task.objects.filter(title__icontains=query)
+        else:
+            tasks = Task.objects.all()
+    except OperationalError as e:
+        # If the DB schema is missing (e.g. new checkout without migrate),
+        # try to apply migrations for development convenience and retry.
+        logger.warning("OperationalError when querying tasks: %s", e)
+        try:
+            call_command('migrate', 'todo', '--noinput')
+            # retry query after applying migrations
+            if query:
+                tasks = Task.objects.filter(title__icontains=query)
+            else:
+                tasks = Task.objects.all()
+        except Exception as me:
+            logger.exception("Failed to run migrations automatically: %s", me)
+            # render a friendly error page with next steps
+            return render(request, 'todo/error_migration.html', {'error': str(me)})
 
     if order == 'due':
         tasks = tasks.order_by('due_at')
