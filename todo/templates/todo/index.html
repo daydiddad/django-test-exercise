@@ -5,61 +5,62 @@
   <head>
     <title>ToDoアプリケーション</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="INIAD">
     <link rel="stylesheet" href="{% static 'todo/style.css' %}">
   </head>
 
   <body>
+    <span class="eyebrow">Task Manager</span>
     <h1>サンプルToDoアプリケーション</h1>
     <p>以下のフォームからタスクを登録できます。</p>
-    <form action="{% url 'index' %}" method="post">
+    <form action="{% url 'index' %}" method="post" class="card">
       {% csrf_token %}
-      <div>
-        <label for="titleInput">タイトル</label><br>
+      <div class="field">
+        <label for="titleInput">タイトル</label>
         <input id="titleInput" name="title" type="text" placeholder="タイトルを入力">
       </div>
-      <div>
-        <label for="categoryInput">カテゴリ</label><br>
+      <div class="field">
+        <label for="categoryInput">カテゴリ</label>
         <select id="categoryInput" name="category">
           {% for value, label in category_choices %}
           <option value="{{ value }}">{{ label }}</option>
           {% endfor %}
         </select>
       </div>
-      <div>
-        <label for="dueInput">期限:</label><br>
+      <div class="field">
+        <label for="dueInput">期限</label>
         <input id="dueInput" name="due_at" type="datetime-local">
       </div>
-      <div>
-        <button type="submit">送信</button>
-      </div>
+      <button type="submit" class="btn btn-primary btn-block">タスクを追加</button>
     </form>
-    <br>
 
-    <div>
-      <a href="{% url 'index' %}?order=due{% if query %}&q={{ query|urlencode }}{% endif %}">期限順に並び替え</a> |
-      <a href="{% url 'index' %}?order=post{% if query %}&q={{ query|urlencode }}{% endif %}">投稿日順に並び替え</a>
+    <div class="sort-nav">
+      <a class="{% if current_order == 'due' %}active{% endif %}" href="{% url 'index' %}?order=due{% if query %}&q={{ query|urlencode }}{% endif %}">期限順</a>
+      <a class="{% if current_order == 'post' %}active{% endif %}" href="{% url 'index' %}?order=post{% if query %}&q={{ query|urlencode }}{% endif %}">投稿日順</a>
     </div>
 
-    <form action="{% url 'index' %}" method="post">
+    <form action="{% url 'index' %}" method="post" class="card">
       {% csrf_token %}
-      <div>
-        <label for="searchInput">タイトルで検索</label><br>
+      <div class="field">
+        <label for="searchInput">タイトルで検索</label>
         <input id="searchInput" name="q" type="search" value="{{ query }}" placeholder="タイトルを検索">
         <input type="hidden" name="order" value="{{ current_order }}">
-        <button type="submit">検索</button>
-        <button type="submit" name="action" value="complete">一括完了</button>
-        <button type="submit" name="action" value="delete">一括削除</button>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn-outline">検索</button>
+        <button type="submit" name="action" value="complete" class="btn btn-outline">一括完了</button>
+        <button type="submit" name="action" value="delete" class="btn btn-danger">一括削除</button>
       </div>
 
       {% for task in tasks %}
       <div class="text{% if task.urgency_label == 'Overdue' %} urgent{% elif task.urgency_label == 'Due Soon' %} warning{% endif %} {{ task.category_badge_class }}">
-        <label>
+        <label class="task-title">
           <input type="checkbox" name="task_ids" value="{{ task.pk }}">
           <strong><a href="{% url 'detail' task.id %}">{{ task.title }}</a></strong>
         </label>
         <span class="category-badge {{ task.category_badge_class }}">{{ task.get_category_display }}</span>
-        <ul>
+        <ul class="meta">
           <li>投稿日時: {{ task.posted_at }}</li>
           {% if task.due_at %}
           <li>期限: {{ task.due_at }}</li>
@@ -74,10 +75,14 @@
         <div class="inline-form">
           <label for="dueInput-{{ task.id }}">期限を設定</label>
           <input id="dueInput-{{ task.id }}" name="due_at" type="datetime-local" form="setDeadlineForm-{{ task.id }}" value="{% if task.due_at %}{{ task.due_at|date:'Y-m-d H:i' }}{% endif %}">
-          <button type="submit" form="setDeadlineForm-{{ task.id }}">保存</button>
+          <button type="submit" form="setDeadlineForm-{{ task.id }}" class="btn btn-outline btn-sm">保存</button>
         </div>
       </div>
       {% endfor %}
+
+      {% if not tasks %}
+      <p class="empty">{% if query %}該当するタスクは見つかりませんでした。{% else %}タスクはまだ登録されていません。{% endif %}</p>
+      {% endif %}
     </form>
 
     {% for task in tasks %}
