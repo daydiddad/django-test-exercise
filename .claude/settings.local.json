@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(wsl.exe -e bash -lc \"cd /home/iniad/SW-exercise1/ex11/django-test-exercise && source venv/bin/activate && python manage.py test\")"
+      "Bash(wsl.exe -e bash -lc \"cd /home/iniad/SW-exercise1/ex11/django-test-exercise && source venv/bin/activate && python manage.py test\")",
+      "Bash(pkill -f \"runserver 8765\")",
+      "Bash(python manage.py test todo)"
     ]
   }
 }

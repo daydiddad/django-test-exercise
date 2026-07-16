@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 from todo.models import Task
 
 # Create your tests here.
@@ -54,6 +54,24 @@ class TaskModelTestCase(TestCase):
 
         self.assertFalse(task.is_overdue(current))
 
+    def test_is_due_soon_within_one_day(self):
+        task = Task(title="urgent task", due_at=timezone.now() + timedelta(hours=12))
+        task.save()
+
+        self.assertTrue(task.is_due_soon())
+
+    def test_is_due_soon_after_two_days(self):
+        task = Task(title="future task", due_at=timezone.now() + timedelta(days=2))
+        task.save()
+
+        self.assertFalse(task.is_due_soon())
+
+    def test_urgency_label_for_overdue_task(self):
+        task = Task(title="late task", due_at=timezone.now() - timedelta(hours=1))
+        task.save()
+
+        self.assertEqual(task.urgency_label(), 'Overdue')
+
 
 class TaskViewTestCase(TestCase):
     def test_index_get(self):
@@ -72,6 +90,14 @@ class TaskViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name, 'todo/index.html')
         self.assertEqual(len(response.context['tasks']), 1)
+
+    def test_search_form_post_does_not_create_task(self):
+        client = Client()
+        response = client.post('/', {'q': 'report'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['query'], 'report')
+        self.assertEqual(list(response.context['tasks']), [])
 
     def test_index_order_post(self):
         task1 = Task(title="task1", due_at=timezone.make_aware(datetime(2024, 7, 1)))
@@ -233,3 +259,17 @@ class TaskViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Task.objects.filter(pk=task1.pk).count(), 0)
         self.assertEqual(Task.objects.filter(pk=task2.pk).count(), 1)
+
+    def test_set_deadline_post_success(self):
+        task = Task(title="task1")
+        task.save()
+        client = Client()
+
+        response = client.post('/{}/set-deadline/'.format(task.pk), {
+            'due_at': '2024-07-02 10:00:00',
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/')
+        task.refresh_from_db()
+        self.assertEqual(task.due_at, timezone.make_aware(datetime(2024, 7, 2, 10, 0, 0)))
