@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+
+  <head>
+    <title>ToDoダッシュボード</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="INIAD">
+    <link rel="stylesheet" href="{% static 'todo/style.css' %}">
+  </head>
+
+  <body>
+    <span class="eyebrow">Dashboard</span>
+    <h1>タスクダッシュボード</h1>
+    <p>現在のタスク状況をまとめて確認できます。</p>
+
+    <section class="dashboard-grid">
+      <article class="metric-card">
+        <p class="metric-label">合計タスク</p>
+        <p class="metric-value">{{ total_count }}</p>
+      </article>
+      <article class="metric-card">
+        <p class="metric-label">完了済み</p>
+        <p class="metric-value">{{ completed_count }}</p>
+      </article>
+      <article class="metric-card warning-card">
+        <p class="metric-label">期限間近</p>
+        <p class="metric-value">{{ due_soon_count }}</p>
+      </article>
+      <article class="metric-card urgent-card">
+        <p class="metric-label">期限切れ</p>
+        <p class="metric-value">{{ overdue_count }}</p>
+      </article>
+      <article class="metric-card">
+        <p class="metric-label">期限なし</p>
+        <p class="metric-value">{{ no_deadline_count }}</p>
+      </article>
+    </section>
+
+    <section class="recent-tasks card">
+      <h2>最新のタスク</h2>
+      {% if latest_tasks %}
+      <ul class="task-list">
+        {% for task in latest_tasks %}
+        <li>
+          <a href="{% url 'detail' task.id %}">{{ task.title }}</a>
+          <span class="task-meta">{{ task.posted_at }}{% if task.due_at %} | 期限 {{ task.due_at }}{% endif %}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="empty">登録されたタスクがありません。</p>
+      {% endif %}
+    </section>
+
+    <div class="sort-nav">
+      <a href="{% url 'index' %}">タスク一覧に戻る</a>
+    </div>
+  </body>
+
+</html>

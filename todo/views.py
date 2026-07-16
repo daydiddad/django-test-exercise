@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.shortcuts import render, redirect
 from django.http import Http404
 from django.utils import timezone
@@ -69,6 +71,28 @@ def detail(request, task_id):
         'task': task,
     }
     return render(request, 'todo/detail.html', context)
+
+
+def dashboard(request):
+    now = timezone.now()
+    tasks = Task.objects.all()
+    total_count = tasks.count()
+    completed_count = tasks.filter(completed=True).count()
+    overdue_count = tasks.filter(completed=False, due_at__lt=now).count()
+    due_soon_count = tasks.filter(completed=False, due_at__gte=now, due_at__lte=now + timedelta(days=1)).count()
+    no_deadline_count = tasks.filter(due_at__isnull=True).count()
+    latest_tasks = tasks.order_by('-posted_at')[:5]
+
+    context = {
+        'total_count': total_count,
+        'completed_count': completed_count,
+        'overdue_count': overdue_count,
+        'due_soon_count': due_soon_count,
+        'no_deadline_count': no_deadline_count,
+        'latest_tasks': latest_tasks,
+    }
+    return render(request, 'todo/dashboard.html', context)
+
 
 def delete(request, task_id):
     try:
