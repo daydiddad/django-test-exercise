@@ -19,6 +19,14 @@
         <input id="titleInput" name="title" type="text" placeholder="タイトルを入力">
       </div>
       <div>
+        <label for="categoryInput">カテゴリ</label><br>
+        <select id="categoryInput" name="category">
+          {% for value, label in category_choices %}
+          <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
         <label for="dueInput">期限:</label><br>
         <input id="dueInput" name="due_at" type="datetime-local">
       </div>
@@ -45,11 +53,12 @@
       </div>
 
       {% for task in tasks %}
-      <div class="text{% if task.urgency_label == 'Overdue' %} urgent{% elif task.urgency_label == 'Due Soon' %} warning{% endif %}">
+      <div class="text{% if task.urgency_label == 'Overdue' %} urgent{% elif task.urgency_label == 'Due Soon' %} warning{% endif %} {{ task.category_badge_class }}">
         <label>
           <input type="checkbox" name="task_ids" value="{{ task.pk }}">
           <strong><a href="{% url 'detail' task.id %}">{{ task.title }}</a></strong>
         </label>
+        <span class="category-badge {{ task.category_badge_class }}">{{ task.get_category_display }}</span>
         <ul>
           <li>投稿日時: {{ task.posted_at }}</li>
           {% if task.due_at %}

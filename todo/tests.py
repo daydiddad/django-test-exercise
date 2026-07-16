@@ -31,6 +31,20 @@ class TaskModelTestCase(TestCase):
         self.assertFalse(task.completed)
         self.assertIsNone(task.due_at, None)
 
+    def test_create_task_with_category(self):
+        task = Task(title="task3", category="アルバイト")
+        task.save()
+
+        task = Task.objects.get(pk=task.pk)
+        self.assertEqual(task.category, "アルバイト")
+
+    def test_default_category_is_homework(self):
+        task = Task(title="task4")
+        task.save()
+
+        task = Task.objects.get(pk=task.pk)
+        self.assertEqual(task.category, "課題")
+
     def test_is_overdue_future(self):
         due = timezone.make_aware(datetime(2024, 6, 30, 23, 59, 59))
         current = timezone.make_aware(datetime(2024, 6, 30, 0, 0, 0))
